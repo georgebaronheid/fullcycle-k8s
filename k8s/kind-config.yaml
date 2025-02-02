@@ -1,0 +1,9 @@
+# Configurations exclusive to kind's local usage
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+
+nodes:
+  - role: control-plane # control node - master - that manages kubernetes
+  - role: worker # worker node - slave - that runs the application
+  - role: worker # worker node - slave - that runs the application
+  - role: worker # worker node - slave - that runs the application
