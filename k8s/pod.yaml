@@ -1,0 +1,14 @@
+# K8s has an API, by these files we tell k8s how to do its job.
+apiVersion: v1
+kind: Pod # the kind that is related to managing pods
+metadata:
+  name: go-server
+  labels: # helps us settings rules, filters etc
+    app: go-server
+
+spec:
+  containers: # we should use one container per pod. If we need more, we should use more pods.
+    - name: go-server
+      image: "georgebaronheid/fullcycler-k8s:latest"
+
+# kubeclt apply -f pod.yaml - this command applies this config file

@@ -7,3 +7,5 @@ nodes:
   - role: worker # worker node - slave - that runs the application
   - role: worker # worker node - slave - that runs the application
   - role: worker # worker node - slave - that runs the application
+
+# kind create cluster --config=k8s/kind-config.yaml --name=fullcycle
