@@ -47,3 +47,7 @@ spec:
 # go-server-{REPLICASET-HASH}-{POD-HASH}
 
 # This is a living example of the composite nature of k8s and deployments.
+
+# ROLLBACK
+# kubectl rollout history deployment go-server
+# kubectl rollout undo deployment go-server --to-revision=1 | kubectl rollout undo deployment go-server
