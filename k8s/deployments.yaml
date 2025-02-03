@@ -1,0 +1,49 @@
+# Deployment > ReplicaSet > Pods - Hierarchical structure
+# A deployment creates a replicaset, which creates pods.
+# Therefore, if we compare replicaset.yaml and deployment.yaml, we'll see that the only difference is the kind, and they build onto each other.
+apiVersion: apps/v1 # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+kind: Deployment # As simples as it seems, this is the only difference when compared to replicaset.yaml
+metadata:
+  name: go-server
+  labels:
+    app: go-server
+
+spec:
+  selector:
+    matchLabels:
+      app: go-server
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+
+  template:
+    metadata: # this is a copy and paste of pod.yaml metadata and specs
+      #      name: go-server # not required in this step
+      labels:
+        app: go-server
+        context: backend
+
+    spec:
+      containers:
+        - name: go-server
+          image: "georgebaronheid/fullcycler-k8s:v1.0.0"
+
+# kubectl apply -f k8s/deployments.yaml - this command applies this config file
+
+# kubectl get deployments
+# output:
+# go-server
+
+# kubectl get replicaset
+# output:
+# go-server-{REPLICASET-HASH}
+
+# kubectl get pods
+# output:
+# go-server-{REPLICASET-HASH}-{POD-HASH}
+
+# This is a living example of the composite nature of k8s and deployments.
