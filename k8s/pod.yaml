@@ -1,4 +1,4 @@
-# K8s has an API, by these files we tell k8s how to do its job.
+# K8s has an API, by these files we tell k8s how to do its job. https://kubernetes.io/docs/concepts/workloads/pods/
 apiVersion: v1
 kind: Pod # the kind that is related to managing pods
 metadata:
@@ -11,4 +11,4 @@ spec:
     - name: go-server
       image: "georgebaronheid/fullcycler-k8s:latest"
 
-# kubeclt apply -f pod.yaml - this command applies this config file
+# kubectl apply -f pod.yaml - this command applies this config file
