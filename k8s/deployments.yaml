@@ -12,7 +12,7 @@ spec:
   selector:
     matchLabels:
       app: go-server
-  replicas: 4
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -30,10 +30,26 @@ spec:
     spec:
       containers:
         - name: go-server
-          image: "georgebaronheid/fullcycler-k8s:v1.0.0"
+          image: "georgebaronheid/fullcycler-k8s:v1.1.0"
           ports:
             - containerPort: 8080
               name: go-server-ports
+          envFrom: # most straightforward way to reference a configmap
+            - configMapRef:
+                name: go-server-env
+#          env:
+#            - name: NAME
+##              value: "George" - most simple way
+#              valueFrom: - referencing the configmap from configmap-env.yaml
+#                configMapKeyRef:
+#                  name: go-server-env
+#                  key: NAME
+#            - name: AGE
+##              value: "29"
+#              valueFrom:
+#                configMapKeyRef:
+#                  name: go-server-env
+#                  key: AGE
 
 # kubectl apply -f k8s/deployments.yaml - this command applies this config file
 
