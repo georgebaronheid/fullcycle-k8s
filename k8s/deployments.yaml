@@ -30,13 +30,29 @@ spec:
     spec:
       containers:
         - name: go-server
-          image: "georgebaronheid/fullcycler-k8s:v1.1.0"
+          image: "georgebaronheid/fullcycle-k8s:v1.3.0"
           ports:
             - containerPort: 8080
               name: go-server-ports
           envFrom: # most straightforward way to reference a configmap
             - configMapRef:
                 name: go-server-env
+            - secretRef:
+                name: go-server-secrets
+
+          volumeMounts: # monta um volume que declaramos abaixo
+            - mountPath: /app/myfamily # /app é o diretório do container - Workdir do dockerfile
+              name: config # same as the configmap name
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: configmap-family
+            items:
+              - key: members
+                path: family.txt
+
+
 #          env:
 #            - name: NAME
 ##              value: "George" - most simple way
