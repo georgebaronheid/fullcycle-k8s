@@ -32,6 +32,15 @@ spec:
         - name: go-server
           image: "georgebaronheid/fullcycle-k8s:v1.3.2"
 
+          # runs at startup until it works correctly, then it's disabled.
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            periodSeconds: 3
+            failureThreshold: 30
+
+          # Both of these run only after startupProbe is successful
           # readiness means that the container is ready to serve traffic. If not ready it will not receive traffic.
           readinessProbe:
             httpGet:
@@ -40,14 +49,6 @@ spec:
             periodSeconds: 3
             failureThreshold: 2
             initialDelaySeconds: 10
-
-          # runs at startup until it works correctly, then it's disabled.
-          startupProbe:
-            httpGet:
-              path: /healthz
-              port: 8080
-            periodSeconds: 3
-            failureThreshold: 30
 
           # liveness means the container is alive. If it's not alive, it will be restarted.
           livenessProbe:
