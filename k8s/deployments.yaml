@@ -32,6 +32,21 @@ spec:
         - name: go-server
           image: "georgebaronheid/fullcycle-k8s:v1.3.2"
 
+          resources:
+            # kubectl top pod (pod-name) -n (namespace) - shows the resources being used by the pod
+            # We need to benchmark our application to figure out the best values for these fields.
+            requests: # container's minimum requirements - we're reserving this amount of resources within our cluster to this pod.
+              # we use vCPUs and memory
+              # vCPU has 1000 millicores (1000m = 1 core) within shared CPUs. Percentage is also possible such as 0.5 - 500millicores
+              cpu: 100m # 0.1 vCPU
+              memory: 20Mi # we use MiB and GiB
+
+            # We must avoid that the sum of every limit in a node is higher than the node's capacity.
+            limits: # container's maximum requirements - we're limiting the amount of resources it can scale into
+              cpu: 500m
+              memory: 25Mi
+
+
           # runs at startup until it works correctly, then it's disabled.
           startupProbe:
             httpGet:
