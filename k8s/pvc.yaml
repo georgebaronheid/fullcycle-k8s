@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: go-server-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce # posso gravar e ler desde que esteja dentro do mesmo node
+  resources:
+    requests:
+      storage: 5Gi
