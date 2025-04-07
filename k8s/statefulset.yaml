@@ -1,0 +1,36 @@
+apiVersion: apps/v1 # https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  replicas: 3
+  serviceName: mysql-headless # vira o DNS name.
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      app: mysql  # it has to match spec.template.metadata.labels
+  template:
+    metadata:
+      labels:
+        app: mysql # it has to match spec.selector.matchLabels
+
+    spec:
+      containers:
+        - name: mysql
+          image: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-pv-claim
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-pv-claim
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi
+
+

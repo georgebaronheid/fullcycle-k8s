@@ -26,11 +26,10 @@ spec:
       labels:
         app: go-server
         context: backend
-
     spec:
       containers:
         - name: go-server
-          image: "georgebaronheid/fullcycle-k8s:v1.3.2"
+          image: "georgebaronheid/fullcycle-k8s:v1.3.3"
 
           resources:
             # kubectl top pod (pod-name) -n (namespace) - shows the resources being used by the pod

@@ -1,0 +1,25 @@
+apiVersion: apps/v1 # https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
+kind: StatefulSet
+metadata:
+  name: go-servers
+spec:
+  replicas: 5
+  serviceName: go-server-headless
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      app: go-server-stateful  # it has to match spec.template.metadata.labels
+  template:
+    metadata:
+      labels:
+        app: go-server-stateful # it has to match spec.selector.matchLabels
+    spec:
+      containers:
+        - name: go-server
+          image: "georgebaronheid/fullcycle-k8s:v1.3.3"
+          ports:
+            - containerPort: 9000
+              name: go-server-ports
+              protocol: TCP
+
+
