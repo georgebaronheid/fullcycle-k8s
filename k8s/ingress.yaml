@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1 # https://kubernetes.github.io/ingress-nginx/deploy/
+kind: Ingress
+metadata:
+  name: ingress-host
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-k8s # same as defined in the cluster-issuer.yaml
+    ingress.kubernetes.io/force-ssl-redirect: "true" # force SSL redirect
+spec:
+  ingressClassName: nginx
+  rules:
+    - host:  "baronheid.com" # como não sou dono deste domínio, não conseguirei acessar
+      http:
+        paths:
+          - backend:
+              service:
+                name: go-server-service
+                port:
+                  number: 9000
+            pathType: Prefix
+            path: "/"
+  tls:
+    - hosts:
+        - "baronheid.com"
+      secretName: letsencrypt-k8s-secret # same as defined in the cluster-issuer.yaml"
