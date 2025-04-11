@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: go-server-svc-acc
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: role-read
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [ "apps" ]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch"]
+
+#apiVersion: rbac.authorization.k8s.io/v1 This would be used Cluster wide, instead of being limited to a single namespace.
+#kind: ClusterRole
+#metadata:
+#  name: role-read
+#rules:
+#  - apiGroups: [ "" ]
+#    resources: [ "pods", "services" ]
+#    verbs: [ "get", "list", "watch" ]
+#  - apiGroups: [ "apps" ]
+#    resources: [ "deployments" ]
+#    verbs: [ "get", "list", "watch" ]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rolebinding-read
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: go-server-svc-acc
+    namespace: default
+roleRef:
+  kind: Role
+  name: role-read
+  apiGroup: rbac.authorization.k8s.io
+
+#apiVersion: rbac.authorization.k8s.io/v1
+#kind: ClusterRoleBinding
+#metadata:
+#  name: rolebinding-read
+#subjects:
+#  - kind: ServiceAccount
+#    name: go-server-svc-acc
+#    namespace: default
+#roleRef:
+#  kind: ClusterRole
+#  name: role-read
+#  apiGroup: rbac.authorization.k8s.io

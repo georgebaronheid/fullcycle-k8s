@@ -12,6 +12,9 @@ var startedAt = time.Now()
 
 func main() {
 
+	fs := http.FileServer(http.Dir("content"))
+	http.Handle("/content/", http.StripPrefix("/content/", fs))
+
 	http.HandleFunc("/healthz", Healthz)
 	http.HandleFunc("/secrets", Secrets)
 	http.HandleFunc("/configmap", ConfigMap)
@@ -51,8 +54,21 @@ func ConfigMap(w http.ResponseWriter, r *http.Request) {
 
 func Hello(w http.ResponseWriter, r *http.Request) {
 
-	name := os.Getenv("NAME")
-	age := os.Getenv("AGE")
+	_ = os.Getenv("NAME")
+	_ = os.Getenv("AGE")
 
-	fmt.Fprintf(w, "<h1> Hello, I'm %s and I'm %s years old!!! </h1>", name, age) // w.Write([]byte("<h1> Hello, FullCycle!!! </h1>"))
+	fmt.Fprintf(w, `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Baronheid</title>
+	<link rel="shortcut icon" href="content/fav-icon.png" type="image/png">
+</head>
+<body>
+    <div style="text-align: center;">
+        <img src="content/em-dev-branco.png" alt="Em desenvolvimento">
+    </div>
+</body>
+</html>
+`) // w.Write([]byte("<h1> Hello, FullCycle!!! </h1>"))
 }

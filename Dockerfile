@@ -8,13 +8,18 @@ RUN go mod download
 
 COPY server.go .
 
+COPY ./content ./content
+
 RUN go build -o server .
 
-#FROM scratch
-#
-#WORKDIR /app
-#
-#COPY --from=builder /app/server .
+FROM scratch
+
+WORKDIR /app
+
+USER 1001:1001
+
+COPY --from=builder /app/server .
+COPY --from=builder /app/content ./content
 
 EXPOSE 8080
 

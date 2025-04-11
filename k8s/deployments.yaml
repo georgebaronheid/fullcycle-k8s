@@ -12,7 +12,7 @@ spec:
   selector:
     matchLabels:
       app: go-server
-  replicas: 2
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -27,9 +27,15 @@ spec:
         app: go-server
         context: backend
     spec:
+      serviceAccountName: go-server-svc-acc
+
       containers:
         - name: go-server
-          image: "georgebaronheid/fullcycle-k8s:v1.3.3"
+          image: "georgebaronheid/fullcycle-k8s:v1.4.3"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+
 
           resources:
             # kubectl top pod (pod-name) -n (namespace) - shows the resources being used by the pod
