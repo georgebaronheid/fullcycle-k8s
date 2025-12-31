@@ -1,0 +1,21 @@
+# https://kubernetes.io/docs/concepts/services-networking/service/
+# This is commonly used when working with cloud providers, as it creates a load balancer for the service.
+# IMPORTANT: This is not available in minikube or kind, as it does not have a cloud provider.
+# It will be created but will not expose an external IP since it lacks cloud providers drivers and configurations.
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-server-service
+
+spec:
+  selector:
+    app: go-server
+  type: LoadBalancer # this is the only difference when compared with service.yaml
+  ports:
+    - name: go-server-service
+      port: 9000
+      targetPort: go-server-ports
+      protocol: TCP
+
+
+

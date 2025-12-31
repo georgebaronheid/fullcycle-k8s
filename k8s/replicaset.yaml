@@ -1,0 +1,34 @@
+apiVersion: apps/v1 # https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+kind: ReplicaSet
+metadata:
+  name: go-server
+  labels:
+    app: go-server
+
+spec:
+  selector: # this is what selects the labels created in other yaml files.
+    matchLabels:
+      app: go-server # this is a simple key-value pair
+  replicas: 2 # how many replicas we want to have
+
+  # Until this point is the configuration of the ReplicaSet. The following is the configuration of the pod.
+
+  template:
+    metadata: # this is a copy and paste of pod.yaml metadata and specs
+#      name: go-server # not required in this step
+      labels:
+        app: go-server
+        context: backend
+
+    spec:
+      containers:
+        - name: go-server
+          image: "georgebaronheid/fullcycler-k8s:v1.0.0"
+
+# kubectl apply -f k8s/replicaset.yaml - this command applies this config file
+# kubectl get replicasets
+
+
+# ReplicaSets have an issue!
+# If we want to update the image of the pod, updating the replicaset won't update the pods.
+# We'd need to kill this replicaset and apply it again so it reflects the changes.

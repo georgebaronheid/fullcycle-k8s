@@ -1,0 +1,15 @@
+apiVersion: autoscaling/v1
+# https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
+# kubectl get hpa
+kind: HorizontalPodAutoscaler
+metadata:
+  name: go-server-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1 # same as defined in the deployment
+    kind: Deployment # same as defined in the deployment
+    name: go-server # same as defined in the deployment
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 30 # 30% of the CPU usage is the threshold for scaling up or down
+

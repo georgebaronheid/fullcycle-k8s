@@ -1,0 +1,21 @@
+# https://kubernetes.io/docs/concepts/services-networking/service/
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-server-service
+
+spec:
+  selector: # this is the label that we use to select the pods that we want to expose
+    app: go-server # this matches with deployments.yaml definition at spec.selector.matchLabels.app
+  type: ClusterIP # https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  ports:
+    - name: go-server-service
+      port: 9000 # same port exposed at de application
+      targetPort: go-server-ports # this is the name of the port that we want to expose. Whenever this is omitted, it will use the same port as the port
+      protocol: TCP # this is the default protocol if not specified
+
+
+## At this point a port-forward is still required.
+
+
+

@@ -1,0 +1,143 @@
+# Deployment > ReplicaSet > Pods - Hierarchical structure
+# A deployment creates a replicaset, which creates pods.
+# Therefore, if we compare replicaset.yaml and deployment.yaml, we'll see that the only difference is the kind, and they build onto each other.
+apiVersion: apps/v1 # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+kind: Deployment # As simples as it seems, this is the only difference when compared to replicaset.yaml
+metadata:
+  name: go-server
+  labels:
+    app: go-server
+
+spec:
+  selector:
+    matchLabels:
+      app: go-server
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+
+  template:
+    metadata: # this is a copy and paste of pod.yaml metadata and specs
+      #      name: go-server # not required in this step
+      labels:
+        app: go-server
+        context: backend
+    spec:
+      serviceAccountName: go-server-svc-acc
+
+      containers:
+        - name: go-server
+          image: "georgebaronheid/fullcycle-k8s:v1.4.3"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+
+
+          resources:
+            # kubectl top pod (pod-name) -n (namespace) - shows the resources being used by the pod
+            # We need to benchmark our application to figure out the best values for these fields.
+            requests: # container's minimum requirements - we're reserving this amount of resources within our cluster to this pod.
+              # we use vCPUs and memory
+              # vCPU has 1000 millicores (1000m = 1 core) within shared CPUs. Percentage is also possible such as 0.5 - 500millicores
+              cpu: 25m # 0.1 vCPU
+              memory: 10Mi # we use MiB and GiB
+
+            # We must avoid that the sum of every limit in a node is higher than the node's capacity.
+            limits: # container's maximum requirements - we're limiting the amount of resources it can scale into
+              cpu: 500m
+              memory: 25Mi
+
+
+          # runs at startup until it works correctly, then it's disabled.
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            periodSeconds: 3
+            failureThreshold: 30
+
+          # Both of these run only after startupProbe is successful
+          # readiness means that the container is ready to serve traffic. If not ready it will not receive traffic.
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            periodSeconds: 3
+            failureThreshold: 2
+            initialDelaySeconds: 10
+
+          # liveness means the container is alive. If it's not alive, it will be restarted.
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            periodSeconds: 5
+            failureThreshold: 1
+            timeoutSeconds: 1
+            successThreshold: 1
+            initialDelaySeconds: 10
+
+          ports:
+            - containerPort: 8080
+              name: go-server-ports
+          envFrom: # most straightforward way to reference a configmap
+            - configMapRef:
+                name: go-server-env
+            - secretRef:
+                name: go-server-secrets
+
+          volumeMounts: # monta um volume que declaramos abaixo
+            - mountPath: /app/myfamily # /app é o diretório do container - Workdir do dockerfile
+              name: config # same as the configmap name
+              readOnly: true
+            - mountPath: /go/pvc
+              name: go-server-pvc-volume
+      volumes:
+        - name: config
+          configMap:
+            name: configmap-family
+            items:
+              - key: members
+                path: family.txt
+        - name: go-server-pvc-volume
+          persistentVolumeClaim:
+            claimName: go-server-pvc
+
+
+#          env:
+#            - name: NAME
+##              value: "George" - most simple way
+#              valueFrom: - referencing the configmap from configmap-env.yaml
+#                configMapKeyRef:
+#                  name: go-server-env
+#                  key: NAME
+#            - name: AGE
+##              value: "29"
+#              valueFrom:
+#                configMapKeyRef:
+#                  name: go-server-env
+#                  key: AGE
+
+# kubectl apply -f k8s/deployments.yaml - this command applies this config file
+
+# kubectl get deployments
+# output:
+# go-server
+
+# kubectl get replicaset
+# output:
+# go-server-{REPLICASET-HASH}
+
+# kubectl get pods
+# output:
+# go-server-{REPLICASET-HASH}-{POD-HASH}
+
+# This is a living example of the composite nature of k8s and deployments.
+
+# ROLLBACK
+# kubectl rollout history deployment go-server
+# kubectl rollout undo deployment go-server --to-revision=1 | kubectl rollout undo deployment go-server
